@@ -296,14 +296,20 @@
       };
 
       try {
-        const res = await fetch(APPS_SCRIPT_URL, {
-          method: "POST",
-          mode: "no-cors",
-          headers: { "Content-Type": "text/plain" },
-          body: JSON.stringify(payload)
+        // Use GET with URL params — avoids all CORS/body-parsing issues with Apps Script
+        const params = new URLSearchParams({
+          date: payload.date,
+          time: payload.time,
+          workoutType: payload.workoutType,
+          dayOfWeek: payload.dayOfWeek
         });
 
-        // no-cors mode means we can't read the response — if no exception, assume success
+        await fetch(`${APPS_SCRIPT_URL}?${params.toString()}`, {
+          method: "GET",
+          mode: "no-cors"
+        });
+
+        // no-cors means we can't read the response — if no exception, assume success
         showSuccess(payload);
       } catch (err) {
         document.getElementById("errorMsg").classList.add("show");
